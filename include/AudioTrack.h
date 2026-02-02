@@ -1,0 +1,83 @@
+#pragma once
+
+#include <string>
+#include "PointerWrapper.h"
+#include <memory>
+#include <vector>
+/**
+ * Base class for all audio track types in the DJ library system.
+ * This class demonstrates virtual functions, Rule of 5, and dynamic memory management.
+ * 
+ */
+class AudioTrack {
+protected:
+    std::string title;
+    std::vector<std::string> artists;
+    int duration_seconds;
+    int bpm;  // beats per minute for mixing
+    double* waveform_data;  // Dynamic array for audio analysis
+    size_t waveform_size;   // Size of the waveform array
+
+public:
+    /**
+     * Constructor - initializes basic track information
+     */
+    AudioTrack(const std::string& title, const std::vector<std::string>& artists, 
+               int duration, int bpm, size_t waveform_samples = 1000);
+
+    virtual ~AudioTrack();
+
+    AudioTrack(const AudioTrack& other);
+
+    AudioTrack& operator=(const AudioTrack& other);
+
+    AudioTrack(AudioTrack&& other) noexcept;
+
+    AudioTrack& operator=(AudioTrack&& other) noexcept;
+
+    // ========== VIRTUAL FUNCTIONS ==========
+
+    /**
+     * Pure virtual function - load track from file
+     * Each format implements this differently
+     * E.g., MP3 might decode headers, WAV might read chunks
+     * This method sets up the track for playback
+     * Practically, it will read metadata and print information
+     */
+    virtual void load() = 0;
+
+    /**
+     * Pure virtual function - analyze beat grid for mixing
+     * Different formats may have different analysis methods
+     * mostly for demonstration; in real systems this might be more complex
+     * This method simply prints a message for demonstration purposes
+     */
+    virtual void analyze_beatgrid() = 0;
+
+    /**
+     * Pure virtual function - calculate audio quality score
+     * MP3 uses bitrate, WAV uses sample rate, etc.
+     */
+    virtual double get_quality_score() const = 0;
+
+    /**
+     * Pure virtual function - create a copy of this track
+     * Demonstrates the prototype pattern with polymorphism
+     */
+    virtual PointerWrapper<AudioTrack> clone() const = 0;
+
+    /**
+     * Function to get a copy of the waveform data
+     */
+    void get_waveform_copy(double* buffer, size_t buffer_size) const;
+
+    void set_bpm(int new_bpm);
+    
+    // ========== ACCESSOR FUNCTIONS ==========
+    std::string get_title() const { return title; }
+    int get_bpm() const { return bpm; }
+    int get_duration() const { return duration_seconds; }
+    std::vector<std::string> get_artists() const { return artists; }
+
+    void clear_data();
+};
