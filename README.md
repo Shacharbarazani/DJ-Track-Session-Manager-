@@ -9,7 +9,7 @@ Run in interactive mode:
 ./bin/dj_manager -I
 
 Run all playlists (Play All mode):
-./bin/dj_manager -I -A
+./bin/dj_manager -I -A > output.txt
 
 ## Requirements
 
